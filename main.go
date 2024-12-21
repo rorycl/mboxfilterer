@@ -19,7 +19,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -78,7 +77,7 @@ func main() {
 	}
 
 	// load configuration
-	filer, err := ioutil.ReadFile(options.Config)
+	filer, err := os.ReadFile(options.Config)
 	if err != nil {
 		fmt.Printf("could not load file: %s", err)
 		os.Exit(1)
@@ -114,8 +113,7 @@ func main() {
 
 	// drain the error chan, exiting on first error
 	go func() {
-		select {
-		case err := <-errorChan:
+		for err := range errorChan {
 			if err != nil {
 				fmt.Println(err)
 				fmt.Println("exiting...")
@@ -130,7 +128,11 @@ func main() {
 	}
 
 	// write out emails with a subject max length of 10 chars
-	emails.Write(writer, 10)
+	err = emails.Write(writer, 10)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	// show stats
 	fmt.Println(filters.Stats())

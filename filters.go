@@ -17,7 +17,6 @@ type filterFunc func(EmailWithSource) (string, bool)
 // have been filtered out by any filter (identified by name).
 type Filters struct {
 	stats      map[string]int
-	idHash     map[string]struct{}
 	filters    []filterFunc
 	filterChan chan string
 	start, end time.Time // processing time
