@@ -135,7 +135,10 @@ func main() {
 	}
 
 	// show stats
-	fmt.Println(filters.Stats())
+	fmt.Print(filters.Stats())
+
+	// show parameters
+	fmt.Println(config)
 
 	// show output file sha256
 	fileName := wfile.Name()
