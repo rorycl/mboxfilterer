@@ -7,6 +7,22 @@ import (
 	"os"
 )
 
+func sha256Summarize(label string, files ...string) (string, error) {
+	output := ""
+	if label != "" {
+		output += fmt.Sprintf("%s\n", label)
+	}
+	for _, f := range files {
+		s, err := fileCalcSHA(f)
+		if err != nil {
+			return "", err
+		}
+		output += fmt.Sprintf("file                     : %s\n", f)
+		output += fmt.Sprintf("sha256sum                : %s\n", s)
+	}
+	return output, nil
+}
+
 func fileCalcSHA(f string) (string, error) {
 	o, err := os.Open(f)
 	if err != nil {

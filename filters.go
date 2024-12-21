@@ -62,7 +62,8 @@ func (f *Filters) Stats() string {
 	dRound := d.Round(time.Millisecond * 10)
 
 	tpl := "%-25s: %4d\n"
-	t := fmt.Sprintf("%-25s: %4s\n", "time processing", dRound)
+	t := "stats\n"
+	t += fmt.Sprintf("%-25s: %4s\n", "time processing", dRound)
 	t += fmt.Sprintf(tpl, "OK", f.stats["ok"])
 	t += "skipped\n"
 	names := []string{}

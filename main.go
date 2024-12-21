@@ -134,6 +134,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	// show input files
+	inputFileSummaries, err := sha256Summarize("input files", options.Args.MboxFiles...)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(inputFileSummaries)
+
 	// show stats
 	fmt.Print(filters.Stats())
 
@@ -143,12 +151,11 @@ func main() {
 	// show output file sha256
 	fileName := wfile.Name()
 	wfile.Close()
-	sha256String, err := fileCalcSHA(fileName)
+	outputFileSummary, err := sha256Summarize("output file", fileName)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Printf("sha256 of %s\n", fileName)
-	fmt.Println(sha256String)
+	fmt.Println(outputFileSummary)
 
 }
