@@ -59,10 +59,12 @@ func (f *Filters) Filter(e EmailWithSource) bool {
 // condition have been called during processing of emails in mboxes.
 func (f *Filters) Stats() string {
 	f.end = time.Now()
-	tpl := "%-30s: %4d\n"
-	t := fmt.Sprintf(tpl, "OK", f.stats["ok"])
-	t += fmt.Sprintf("%-30s: %s\n\n", "time processing", f.end.Sub(f.start))
+	d := f.end.Sub(f.start)
+	dRound := d.Round(time.Millisecond * 10)
 
+	tpl := "%-25s: %4d\n"
+	t := fmt.Sprintf("%-25s: %4s\n", "time processing", dRound)
+	t += fmt.Sprintf(tpl, "OK", f.stats["ok"])
 	t += "skipped\n"
 	names := []string{}
 	for k := range f.stats {

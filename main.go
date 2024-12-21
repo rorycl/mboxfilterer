@@ -134,4 +134,16 @@ func main() {
 
 	// show stats
 	fmt.Println(filters.Stats())
+
+	// show output file sha256
+	fileName := wfile.Name()
+	wfile.Close()
+	sha256String, err := fileCalcSHA(fileName)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Printf("sha256 of %s\n", fileName)
+	fmt.Println(sha256String)
+
 }
