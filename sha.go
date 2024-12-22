@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 )
 
 func sha256Summarize(label string, files ...string) (string, error) {
@@ -12,15 +13,42 @@ func sha256Summarize(label string, files ...string) (string, error) {
 	if label != "" {
 		output += fmt.Sprintf("%s\n", label)
 	}
-	for _, f := range files {
-		s, err := fileCalcSHA(f)
-		if err != nil {
-			return "", err
-		}
-		output += fmt.Sprintf("file                     : %s\n", f)
-		output += fmt.Sprintf("sha256sum                : %s\n", s)
+
+	type sumErr struct {
+		sum string
+		err error
 	}
-	return output, nil
+	results := make(chan sumErr)
+	var err error
+
+	var wg sync.WaitGroup
+	wg.Add(len(files))
+	for _, f := range files {
+		go func(ff string) {
+			defer wg.Done()
+			sum, err := fileCalcSHA(ff)
+			if err != nil {
+				results <- sumErr{err: err}
+				return
+			}
+			s := ""
+			s += fmt.Sprintf("file                     : %s\n", f)
+			s += fmt.Sprintf("sha256sum                : %s\n", sum)
+			results <- sumErr{s, nil}
+		}(f)
+	}
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+	for r := range results {
+		if r.err != nil {
+			err = r.err
+			break
+		}
+		output += r.sum
+	}
+	return output, err
 }
 
 func fileCalcSHA(f string) (string, error) {

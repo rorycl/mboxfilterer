@@ -21,7 +21,7 @@ type Config struct {
 // String describes a Config for printing.
 func (c Config) String() string {
 	t := `
-configuration
+config
 report start date        : %s
 report end date          : %s
 sender ip fragment       : %s
@@ -126,19 +126,3 @@ func LoadYaml(yamlByte []byte) (Config, error) {
 	}
 	return config, nil
 }
-
-/*
-func main() {
-	filer, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		fmt.Printf("could not load file: %s", err)
-		os.Exit(1)
-	}
-	config, err := LoadYaml(filer)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println(config)
-}
-*/
