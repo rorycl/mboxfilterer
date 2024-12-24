@@ -1,3 +1,5 @@
+github.com/ProtonMail/go-mbox v1.1.0 h1:vrEcpvX5YfOkld5Q2fil41gXnLbYWKbE2gezZr6rqBU=
+github.com/ProtonMail/go-mbox v1.1.0/go.mod h1:ToecLYsf8RlxhndDEdjUa+eIfxuTxSQcxUQcGF6XB3A=
 github.com/attilabuti/mbox v1.0.0 h1:SWcYZBtJZZBOh5X+bvimZgqLPWXLFrR7ZSo5jCT/xAA=
 github.com/attilabuti/mbox v1.0.0/go.mod h1:p5RDEPxZXSlzfXR7NmhXWAT634GRC/Z5iF/QowNB99M=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
