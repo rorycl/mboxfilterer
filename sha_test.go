@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"testing"
 
@@ -30,6 +31,14 @@ func TestFileCalcSHA(t *testing.T) {
 	}
 }
 
+// resort strings because they can come back in different orders due to
+// goroutines
+func sortStringLines(s string) string {
+	ss := strings.Split(s, "\n")
+	slices.Sort(ss)
+	return strings.Join(ss, "\n")
+}
+
 func TestSHAFiles(t *testing.T) {
 	want := `test
 file                     : testdata/gonuts.mbox
@@ -42,6 +51,8 @@ sha256sum                : 8716f9d26984405c068dc64427c43c021bfd7b3c7ac4129b338bb
 	if err != nil {
 		t.Error(err)
 	}
+	got = sortStringLines(got)
+	want = sortStringLines(want)
 	if !cmp.Equal(got, want) {
 		t.Errorf("values are not the same %s", cmp.Diff(got, want))
 	}
