@@ -21,21 +21,19 @@ type Config struct {
 // String describes a Config for printing.
 func (c Config) String() string {
 	t := `
-config
-report start date        : %s
-report end date          : %s
-sender ip fragment       : %s
-valid sender regexp      : %s
-holidays                 :
+ReportStart        %s
+ReportEnd          %s
+ReceivedIPFragment %s
+ValidSenderRegexp  %s
 `
 	s := fmt.Sprintf(t,
 		time.Time(c.ReportStart).Format("2006-01-02"),
 		time.Time(c.ReportEnd).Format("2006-01-02"),
 		c.ReceivedIPFragment,
-		c.ValidSenderRegexp.String(),
+		c.ValidSenderRegexp,
 	)
 	for _, h := range c.Holidays {
-		s += fmt.Sprintf("                           %s\n", h)
+		s += fmt.Sprintf("   %s\n", h)
 	}
 	return s
 }

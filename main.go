@@ -19,8 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"os"
-	"sync"
 	"time"
 
 	flags "github.com/jessevdk/go-flags"
@@ -29,10 +29,9 @@ import (
 // Options are flags options
 type Options struct {
 	// Verbose  bool `short:"v" long:"verbose"  description:"show verbose output\nthis presently does not do much"`
-	Config  string `short:"c" long:"config" description:"yaml configuration file (required)" required:"yes"`
-	Output  string `short:"o" long:"output" description:"optional output csv file"`
-	shasums string
-	Args    struct {
+	Config string `short:"c" long:"config" description:"yaml configuration file (required)" required:"yes"`
+	Output string `short:"o" long:"output" description:"optional output csv file"`
+	Args   struct {
 		MboxFiles []string `description:"one or more mbox files to process"`
 	} `positional-args:"yes" required:"yes"`
 }
@@ -78,21 +77,8 @@ func main() {
 		}
 	}
 
-	// start processing shasums for input files
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		options.shasums, err = sha256Summarize("input files", options.Args.MboxFiles...)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}()
-
 	// load configuration
-	filer, err := os.ReadFile(options.Config)
+	filer, err := ioutil.ReadFile(options.Config)
 	if err != nil {
 		fmt.Printf("could not load file: %s", err)
 		os.Exit(1)
@@ -128,7 +114,8 @@ func main() {
 
 	// drain the error chan, exiting on first error
 	go func() {
-		for err := range errorChan {
+		select {
+		case err := <-errorChan:
 			if err != nil {
 				fmt.Println(err)
 				fmt.Println("exiting...")
@@ -143,30 +130,8 @@ func main() {
 	}
 
 	// write out emails with a subject max length of 10 chars
-	err = emails.Write(writer, 10)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	emails.Write(writer, 10)
 
 	// show stats
-	fmt.Print(filters.Stats())
-
-	// show parameters
-	fmt.Println(config)
-
-	// show input files processed in goroutine above
-	wg.Wait()
-	fmt.Println(options.shasums)
-
-	// show output file sha256
-	fileName := wfile.Name()
-	wfile.Close()
-	outputFileSummary, err := sha256Summarize("output file", fileName)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println(outputFileSummary)
-
+	fmt.Println(filters.Stats())
 }

@@ -6,8 +6,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/rorycl/letters"
 )
 
 type filterFunc func(EmailWithSource) (string, bool)
@@ -17,6 +15,7 @@ type filterFunc func(EmailWithSource) (string, bool)
 // have been filtered out by any filter (identified by name).
 type Filters struct {
 	stats      map[string]int
+	idHash     map[string]struct{}
 	filters    []filterFunc
 	filterChan chan string
 	start, end time.Time // processing time
@@ -58,14 +57,11 @@ func (f *Filters) Filter(e EmailWithSource) bool {
 // condition have been called during processing of emails in mboxes.
 func (f *Filters) Stats() string {
 	f.end = time.Now()
-	d := f.end.Sub(f.start)
-	dRound := d.Round(time.Millisecond * 10)
+	tpl := "%-30s: %4d\n"
+	t := fmt.Sprintf(tpl, "OK", f.stats["ok"])
+	t += fmt.Sprintf("%-30s: %s\n\n", "time processing", f.end.Sub(f.start))
 
-	tpl := "%-25s: %4d\n"
-	t := "stats\n"
-	t += fmt.Sprintf("%-25s: %4s\n", "time processing", dRound)
-	t += fmt.Sprintf(tpl, "OK", f.stats["ok"])
-	t += "skipped\n"
+	var statString string
 	names := []string{}
 	for k := range f.stats {
 		names = append(names, k)
@@ -76,18 +72,18 @@ func (f *Filters) Stats() string {
 			continue
 		}
 		v := f.stats[k]
-		t += fmt.Sprintf(tpl, k, v)
+		statString += fmt.Sprintf(tpl, k, v)
 	}
-	return t
+	if statString == "" {
+		return t + fmt.Sprintf(tpl, "skipped", 0)
+	}
+	return t + "skipped \n" + statString
 }
 
 // newFilterByID filters out emails not matching the provided IP fragment
 func newFilterIP(name string, ipFragment string) filterFunc {
 	return func(e EmailWithSource) (string, bool) {
-		return name, strings.Contains(
-			strings.Join(e.Headers.ExtraHeaders["Received"], " "),
-			ipFragment,
-		)
+		return name, strings.Contains(strings.Join(e.Headers.Received, " "), ipFragment)
 	}
 }
 
@@ -129,7 +125,7 @@ func newFilterBySender(name string, validSenderRegexp *regexp.Regexp) filterFunc
 
 // newFilterByID filters out emails with duplicate IDs
 func newFilterByID(name string) filterFunc {
-	idHash := map[letters.MessageId]struct{}{}
+	idHash := map[string]struct{}{}
 	return func(e EmailWithSource) (string, bool) {
 		if _, ok := idHash[e.MessageID]; ok {
 			return name, false

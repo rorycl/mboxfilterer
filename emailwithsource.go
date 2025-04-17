@@ -3,13 +3,13 @@ package main
 import (
 	"strings"
 
-	"github.com/rorycl/letters"
+	"github.com/rorycl/letters/email"
 )
 
 // EmailWithSource represents the headers of an email with their mbox
 // source
 type EmailWithSource struct {
-	letters.Headers
+	email.Headers
 	source string // source mbox
 }
 
@@ -30,6 +30,6 @@ func (e EmailWithSource) forCSV(subjLen int) []string {
 		e.subj(subjLen),
 		e.source,
 		string(e.MessageID),
-		strings.Join(e.ExtraHeaders["Received"], " "),
+		strings.Join(e.Headers.Received, " "),
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rorycl/letters"
+	"github.com/rorycl/letters/email"
 )
 
 func discardName(name string, result bool) bool {
@@ -53,9 +53,8 @@ func TestReceivedFilter(t *testing.T) {
 		},
 	}
 	for i, tt := range tests {
-		e := EmailWithSource{letters.Headers{}, "test"}
-		e.ExtraHeaders = map[string][]string{}
-		e.ExtraHeaders["Received"] = []string{tt.received}
+		e := EmailWithSource{email.Headers{}, "test"}
+		e.Received = []string{tt.received}
 		t.Run(fmt.Sprintf("test_%d", i), func(t *testing.T) {
 			if got, want := discardName(nf(e)), tt.ok; got != want {
 				t.Errorf("received %s\ngot %t want %t", tt.received, got, want)
@@ -90,7 +89,7 @@ func TestSenderFilter(t *testing.T) {
 		{"sid@bobthebuilder.com", false},
 		{"sto@smythersbrown.net", true},
 	} {
-		e := EmailWithSource{letters.Headers{}, "test"}
+		e := EmailWithSource{email.Headers{}, "test"}
 		e.From = []*mail.Address{&mail.Address{Address: tt.address}}
 		t.Run(fmt.Sprintf("test_%d", i), func(t *testing.T) {
 			if got, want := discardName(nf(e)), tt.ok; got != want {
@@ -130,7 +129,7 @@ func TestHolidaysFilter(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		e := EmailWithSource{letters.Headers{}, "test"}
+		e := EmailWithSource{email.Headers{}, "test"}
 		e.Date = tt.date
 		t.Run(fmt.Sprintf("test %d", i), func(t *testing.T) {
 			if got, want := discardName(nf(e)), tt.ok; got != want {
@@ -163,7 +162,7 @@ func TestReportDateFilter(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		e := EmailWithSource{letters.Headers{}, "test"}
+		e := EmailWithSource{email.Headers{}, "test"}
 		e.Date = tt.date
 		t.Run(fmt.Sprintf("test %d", i), func(t *testing.T) {
 			if got, want := discardName(nf(e)), tt.ok; got != want {
@@ -177,17 +176,17 @@ func TestIDFilter(t *testing.T) {
 
 	nf := newFilterByID("id filter")
 	tests := []struct {
-		id letters.MessageId
+		id string
 		ok bool
 	}{
-		{letters.MessageId("a"), true},
-		{letters.MessageId("b"), true},
-		{letters.MessageId("a"), false},
-		{letters.MessageId("c"), true},
-		{letters.MessageId("b"), false},
+		{"a", true},
+		{"b", true},
+		{"a", false},
+		{"c", true},
+		{"b", false},
 	}
 	for i, tt := range tests {
-		e := EmailWithSource{letters.Headers{}, "test"}
+		e := EmailWithSource{email.Headers{}, "test"}
 		e.MessageID = tt.id
 		t.Run(fmt.Sprintf("test %d", i), func(t *testing.T) {
 			if got, want := discardName(nf(e)), tt.ok; got != want {

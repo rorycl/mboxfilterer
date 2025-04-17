@@ -64,8 +64,11 @@ holidayStrings:
     end: "2022-02-27"
 `)
 
-	_, err := LoadYaml(yaml)
+	config, err := LoadYaml(yaml)
 	if err != nil {
 		t.Fatalf("got unexpected error %s", err)
+	}
+	if got, want := config.ReceivedIPFragment, "10.1.99."; got != want {
+		t.Errorf("got %s want %s", got, want)
 	}
 }

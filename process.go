@@ -6,8 +6,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ProtonMail/go-mbox"
+	"github.com/attilabuti/mbox"
 	"github.com/rorycl/letters"
+	"github.com/rorycl/letters/parser"
 )
 
 // process processes email mbox files, processing each file
@@ -54,8 +55,8 @@ func process(filers []string, filters *Filters) (<-chan EmailWithSource, <-chan 
 					return
 				}
 
-				// parse message using customised mnako/letters
-				message, err := letters.ParseEmail(msg, "HeadersOnly")
+				p := letters.NewParser(parser.WithHeadersOnly())
+				message, err := p.Parse(msg)
 				if err != nil {
 					errorChan <- fmt.Errorf("letters parsing error for %s, %w", filer, err)
 					done <- struct{}{} // stop further processing
