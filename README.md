@@ -1,6 +1,6 @@
 # mboxfilterer
 
-version 0.0.1 : 21 December 2024
+version 0.0.4 : 19 April 2025
 
 Filter emails in a set of mailboxes in unix mbox format by various
 criteria to summarise these emails in a csv report. 
