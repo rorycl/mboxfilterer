@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/attilabuti/mbox"
+	"github.com/ProtonMail/go-mbox"
 	"github.com/rorycl/letters"
 	"github.com/rorycl/letters/parser"
 )

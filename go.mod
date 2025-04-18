@@ -3,7 +3,7 @@ module mboxfilterer
 go 1.24
 
 require (
-	github.com/attilabuti/mbox v1.0.0
+	github.com/ProtonMail/go-mbox v1.1.0
 	github.com/google/go-cmp v0.6.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/rorycl/letters v0.1.2
